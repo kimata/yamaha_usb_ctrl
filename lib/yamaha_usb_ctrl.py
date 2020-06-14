@@ -36,7 +36,7 @@ def print_progress(message, is_show=False):
     if is_show:
         print(message, end='')
 
-def yamaha_usb_ctrl(config, addr, mode, show_progress=False):
+def ctrl(config, addr, mode, show_progress=False):
     print_progress('Login        ... ', show_progress)
 
     tel = telnetlib.Telnet(addr)
@@ -81,7 +81,7 @@ if __name__ == '__main__':
     config = yaml.load(open(conf_file, 'r'), Loader=yaml.BaseLoader)
 
     try:
-        yamaha_usb_ctrl(config, opt.get('ADDR'), opt.get('MODE').lower(), True)
+        ctrl(config, opt.get('ADDR'), opt.get('MODE').lower(), True)
         print('\033[1;32m%s\033[0m' % ('SUCESS'))
         sys.exit(0)
     except RuntimeError as e:
