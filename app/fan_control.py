@@ -78,7 +78,7 @@ def judge_fan_state(temp_room):
     now = datetime.datetime.now()
 
     # 夜は温度に関係なく止める
-    if (now.hour < 10) and (now.hour > 20):
+    if (now.hour < 8) or (now.hour > 20):
         return False
 
     # 室温不明ならとりあえず動かす
