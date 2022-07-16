@@ -1,0 +1,9 @@
+version: "2"
+
+services:
+  usb_ctrl:
+    build:
+      context: "."
+    volumes:
+      - "./log:/opt/yamaha_usb_ctrl/log"
+    restart: always

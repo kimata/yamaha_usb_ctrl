@@ -55,7 +55,7 @@ class GZipRotator:
 def get_logger():
     logger = logging.getLogger()
     log_handler = logging.handlers.RotatingFileHandler(
-        "/dev/shm/fan_control.log",
+        "log/fan_control.log",
         encoding="utf8",
         maxBytes=1 * 1024 * 1024,
         backupCount=10,
