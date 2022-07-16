@@ -21,9 +21,9 @@ sys.path.append(os.path.join(os.path.dirname(__file__), os.pardir, 'lib'))
 import yamaha_usb_ctrl
 
 # YAMAH ルータの IP アドレス
-YAMAHA_ROUTER = '192.168.2.1'
+YAMAHA_ROUTER = '192.168.8.1'
 # 温度を取得する InfluxDB のアドレス
-INFLUXDB_HOST = '192.168.2.20:8086'
+INFLUXDB_HOST = '192.168.0.10:8086'
 
 class GZipRotator:
     def namer(name):
