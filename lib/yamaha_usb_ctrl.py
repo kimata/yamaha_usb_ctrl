@@ -40,9 +40,16 @@ def print_progress(message, is_show=False):
 def ctrl(config, mode, show_progress=False):
     print_progress("Login        ... ", show_progress)
 
+    pass_user = config["router"]["pass"]["user"]
+    if config["router"]["pass"]["user"] is None:
+        pass_user = ""
+    pass_admin = config["router"]["pass"]["admin"]
+    if config["router"]["pass"]["admin"] is None:
+        pass_admin = ""
+
     tel = telnetlib.Telnet(config["router"]["addr"])
     tel.read_until(b"Password:")
-    tel.write((config["router"]["pass"]["user"] + "\n").encode("utf-8"))
+    tel.write((pass_user + "\n").encode("utf-8"))
     tel.read_until(b"> ")
 
     print_progress("OK\n", show_progress)
@@ -51,7 +58,7 @@ def ctrl(config, mode, show_progress=False):
 
     tel.write(b"admin\n")
     tel.read_until(b"Password:")
-    tel.write((config["router"]["pass"]["admin"] + "\n").encode("utf-8"))
+    tel.write((pass_admin + "\n").encode("utf-8"))
     tel.read_until(b"# ")
 
     print_progress("OK\n", show_progress)

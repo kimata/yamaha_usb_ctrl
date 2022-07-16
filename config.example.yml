@@ -1,2 +1,18 @@
-pass: 
-admin: 
+influxdb:
+  url: http://tanzania.green-rabbit.net:8086
+  token: fffjkjkgfklhjglkjiojtroijojhkljhklghklfjklhhlnklhnklfgnhklgnhgfdlhfgnhlkngdfnfnhgdkfnh==
+  org: home
+  bucket: sensor
+
+sensor:
+  hostname: rasp-meter-3
+  measure: sensor.rasp
+  param: temp
+
+router:
+  addr: 192.168.8.1
+  pass:
+    user: 
+    admin: 
+
+interval: 300
