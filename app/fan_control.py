@@ -26,14 +26,14 @@ YAMAHA_ROUTER = '192.168.2.1'
 INFLUXDB_HOST = '192.168.2.20:8086'
 
 class GZipRotator:
-    def __call__(self, source, dest):
-        os.rename(source, dest)
-        f_in = open(dest, 'rb')
-        f_out = gzip.open("%s.gz" % dest, 'wb')
-        f_out.writelines(f_in)
-        f_out.close()
-        f_in.close()
-        os.remove(dest)
+    def namer(name):
+        return name + '.gz'
+
+    def rotator(source, dest):
+        with open(source, 'rb') as fs:
+            with gzip.open(dest, 'wb') as fd:
+                fd.writelines(fs)
+        os.remove(source)
 
 def get_logger():
     logger = logging.getLogger()
@@ -45,7 +45,8 @@ def get_logger():
         fmt='%(asctime)s %(levelname)s %(name)s :%(message)s',
         datefmt='%Y/%m/%d %H:%M:%S %Z'
     )
-    log_handler.rotator = GZipRotator()
+    log_handler.namer = GZipRotator.namer
+    log_handler.rotator = GZipRotator.rotator
 
     logger.addHandler(log_handler)
     logger.setLevel(level=logging.INFO)
