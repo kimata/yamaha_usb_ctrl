@@ -29,62 +29,62 @@ import yaml
 import sys
 import os
 
-DEFAULT_CONF_FILE = 'yamaha_config.yml'
-TIMEOUT           = 2
+DEFAULT_CONF_FILE = "yamaha_config.yml"
+TIMEOUT = 2
+
 
 def print_progress(message, is_show=False):
     if is_show:
-        print(message, end='')
+        print(message, end="")
+
 
 def ctrl(config, addr, mode, show_progress=False):
-    print_progress('Login        ... ', show_progress)
+    print_progress("Login        ... ", show_progress)
 
     tel = telnetlib.Telnet(addr)
-    tel.read_until(b'Password:')
-    tel.write((config['pass'] + '\n').encode('utf-8'))
-    tel.read_until(b'> ')
+    tel.read_until(b"Password:")
+    tel.write((config["pass"] + "\n").encode("utf-8"))
+    tel.read_until(b"> ")
 
-    print_progress('OK\n', show_progress)
+    print_progress("OK\n", show_progress)
 
-    print_progress('Enable admin ... ', show_progress)
+    print_progress("Enable admin ... ", show_progress)
 
-    tel.write(b'admin\n')
-    tel.read_until(b'Password:')
-    tel.write((config['admin'] + '\n').encode('utf-8'))
-    tel.read_until(b'# ')
+    tel.write(b"admin\n")
+    tel.read_until(b"Password:")
+    tel.write((config["admin"] + "\n").encode("utf-8"))
+    tel.read_until(b"# ")
 
-    print_progress('OK\n', show_progress)
+    print_progress("OK\n", show_progress)
 
-    tel.write(('usbhost use %s\n' % (mode)).encode('utf-8'))
-    res = tel.read_until(b'# ',     TIMEOUT).decode('utf-8').split('\r\n')
+    tel.write(("usbhost use %s\n" % (mode)).encode("utf-8"))
+    res = tel.read_until(b"# ", TIMEOUT).decode("utf-8").split("\r\n")
     res.pop(0)
     res.pop(-1)
 
-    error = '\n'.join(res)
+    error = "\n".join(res)
 
-    if error != '':
+    if error != "":
         raise RuntimeError(error)
 
 
-if __name__ == '__main__':
-
+if __name__ == "__main__":
     opt = docopt(__doc__)
 
-    if opt.get('-c'):
-        conf_file = opt.get('CONF')
+    if opt.get("-c"):
+        conf_file = opt.get("CONF")
     else:
-        conf_file =  os.path.join(
-            os.path.dirname(os.path.abspath(__file__)),
-            DEFAULT_CONF_FILE
+        conf_file = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)), DEFAULT_CONF_FILE
         )
 
-    config = yaml.load(open(conf_file, 'r'), Loader=yaml.BaseLoader)
+    config = yaml.load(open(conf_file, "r"), Loader=yaml.BaseLoader)
 
     try:
-        ctrl(config, opt.get('ADDR'), opt.get('MODE').lower(), True)
-        print('\033[1;32m%s\033[0m' % ('SUCESS'))
+        ctrl(config, opt.get("ADDR"), opt.get("MODE").lower(), True)
+        print("\033[1;32m%s\033[0m" % ("SUCESS"))
         sys.exit(0)
     except RuntimeError as e:
-        print('\033[1;31m%s\033[0m' % ('FAIL'))
+        print("\033[1;31m%s\033[0m" % ("FAIL"))
         print(e.args[0])
         sys.exit(-1)
