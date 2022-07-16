@@ -2,12 +2,11 @@
 # -*- coding: utf-8 -*-
 
 """
-Usage: yamaha_usb_ctrl.py [-h] [-c CONF] ADDR MODE
+Usage: yamaha_usb_ctrl.py [-h] [-c CONF] MODE
 
 YAMAHA ルータにログインして USB の ON/OFF を制御します．
 
 Arguments:
-  ADDR              YAMAHA ルータアドレス
   MODE              { ON | OFF }
 
 Options:
@@ -29,7 +28,7 @@ import yaml
 import sys
 import os
 
-DEFAULT_CONF_FILE = "yamaha_config.yml"
+DEFAULT_CONF_FILE = "../config.yml"
 TIMEOUT = 2
 
 
@@ -38,12 +37,12 @@ def print_progress(message, is_show=False):
         print(message, end="")
 
 
-def ctrl(config, addr, mode, show_progress=False):
+def ctrl(config, mode, show_progress=False):
     print_progress("Login        ... ", show_progress)
 
-    tel = telnetlib.Telnet(addr)
+    tel = telnetlib.Telnet(config["router"]["addr"])
     tel.read_until(b"Password:")
-    tel.write((config["pass"] + "\n").encode("utf-8"))
+    tel.write((config["router"]["pass"]["user"] + "\n").encode("utf-8"))
     tel.read_until(b"> ")
 
     print_progress("OK\n", show_progress)
@@ -52,7 +51,7 @@ def ctrl(config, addr, mode, show_progress=False):
 
     tel.write(b"admin\n")
     tel.read_until(b"Password:")
-    tel.write((config["admin"] + "\n").encode("utf-8"))
+    tel.write((config["router"]["pass"]["admin"] + "\n").encode("utf-8"))
     tel.read_until(b"# ")
 
     print_progress("OK\n", show_progress)
@@ -81,7 +80,7 @@ if __name__ == "__main__":
     config = yaml.load(open(conf_file, "r"), Loader=yaml.BaseLoader)
 
     try:
-        ctrl(config, opt.get("ADDR"), opt.get("MODE").lower(), True)
+        ctrl(config, opt.get("MODE").lower(), True)
         print("\033[1;32m%s\033[0m" % ("SUCESS"))
         sys.exit(0)
     except RuntimeError as e:
