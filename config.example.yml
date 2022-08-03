@@ -16,3 +16,6 @@ router:
     admin: 
 
 interval: 300
+
+liveness:
+  file: /dev/shm/healthz

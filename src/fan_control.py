@@ -7,18 +7,16 @@
 import sys
 import logging
 import logging.handlers
-import pathlib
-import gzip
 import datetime
-import yaml
+import pathlib
 import time
-import os
-
-sys.path.append(os.path.join(os.path.dirname(__file__), os.pardir, "lib"))
-
-import yamaha_usb_ctrl
+import logging
 
 import influxdb_client
+
+from config import load_config
+import logger
+import yamaha_usb_ctrl
 
 FLUX_QUERY = """
 from(bucket: "{bucket}")
@@ -31,47 +29,6 @@ from(bucket: "{bucket}")
     |> sort(columns: ["_time"], desc: true)
     |> limit(n: 1)
 """
-
-CONFIG_PATH = "../config.yml"
-
-
-def load_config():
-    path = str(pathlib.Path(os.path.dirname(__file__), CONFIG_PATH))
-    with open(path, "r") as file:
-        return yaml.load(file, Loader=yaml.SafeLoader)
-
-
-class GZipRotator:
-    def namer(name):
-        return name + ".gz"
-
-    def rotator(source, dest):
-        with open(source, "rb") as fs:
-            with gzip.open(dest, "wb") as fd:
-                fd.writelines(fs)
-        os.remove(source)
-
-
-def get_logger():
-    logger = logging.getLogger()
-    log_handler = logging.handlers.RotatingFileHandler(
-        "log/fan_control.log",
-        encoding="utf8",
-        maxBytes=1 * 1024 * 1024,
-        backupCount=10,
-    )
-    log_handler.formatter = logging.Formatter(
-        fmt="%(asctime)s %(levelname)s %(name)s :%(message)s",
-        datefmt="%Y/%m/%d %H:%M:%S %Z",
-    )
-    log_handler.namer = GZipRotator.namer
-    log_handler.rotator = GZipRotator.rotator
-
-    logger.addHandler(log_handler)
-    logger.setLevel(level=logging.INFO)
-
-    return logger
-
 
 # InfluxDB にアクセスしてセンサーデータを取得
 def get_db_value(
@@ -137,10 +94,13 @@ def judge_fan_state(temp_room):
     return False
 
 
-logger = get_logger()
+logger.init("FAN auto control")
+
 config = load_config()
 
 while True:
+    logging.info("Start.")
+
     temp_room = fetch_temp(config)
 
     if len(sys.argv) == 1:
@@ -148,16 +108,17 @@ while True:
     else:
         state = sys.argv[1].lower() == "on"
 
-        fan_ctrl(config, state)
-
-    print("FAN is {}".format("ON" if state else "OFF"))
-    sys.stdout.flush()
-
-    logger.info(
+    logging.info(
         "FAN: {} (temp_room: {:.2f})".format(
             "ON" if state else "OFF",
             temp_room if temp_room is not None else 0.0,
         )
     )
+    fan_ctrl(config, state)
 
-    time.sleep(config["interval"])
+    logging.info("Finish.")
+    pathlib.Path(config["liveness"]["file"]).touch()
+
+    sleep_time = config["interval"] - datetime.datetime.now().second
+    logging.info("sleep {sleep_time} sec...".format(sleep_time=sleep_time))
+    time.sleep(sleep_time)
