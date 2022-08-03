@@ -15,4 +15,4 @@ RUN pip3 install 'influxdb-client[ciso]'
 WORKDIR /opt/yamaha_usb_ctrl
 COPY . .
 
-CMD ["./app/fan_control.py"]
+CMD ["./src/fan_control.py"]
