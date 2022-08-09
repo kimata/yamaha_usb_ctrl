@@ -38,7 +38,7 @@ def get_db_value(
     measure,
     param,
 ):
-    token = os.environ.get("INFLUXDB_TOKEN", config["INFLUXDB"]["TOKEN"])
+    token = os.environ.get("INFLUXDB_TOKEN", config["influxdb"]["token"])
     client = influxdb_client.InfluxDBClient(
         url=config["influxdb"]["url"],
         token=token,
