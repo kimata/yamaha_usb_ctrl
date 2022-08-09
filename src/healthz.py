@@ -8,7 +8,7 @@ from config import load_config
 
 config = load_config()
 
-liveness_file = pathlib.Path(config["LIVENESS"]["FILE"])
+liveness_file = pathlib.Path(config["liveness"]["file"])
 
 if not liveness_file.exists():
     print("Not executed.", file=sys.stderr)
@@ -17,7 +17,7 @@ if not liveness_file.exists():
 elapsed = datetime.datetime.now() - datetime.datetime.fromtimestamp(
     liveness_file.stat().st_mtime
 )
-if elapsed.seconds > config["PANEL"]["UPDATE"]["INTERVAL"]:
+if elapsed.seconds > config["interval"]:
     print(
         "Execution interval is too long. ({elapsed:,} sec)".format(
             elapsed=elapsed.seconds
