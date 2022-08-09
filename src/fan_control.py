@@ -11,6 +11,7 @@ import datetime
 import pathlib
 import time
 import logging
+import os
 
 import influxdb_client
 
@@ -37,9 +38,10 @@ def get_db_value(
     measure,
     param,
 ):
+    token = os.environ.get("INFLUXDB_TOKEN", config["INFLUXDB"]["TOKEN"])
     client = influxdb_client.InfluxDBClient(
         url=config["influxdb"]["url"],
-        token=config["influxdb"]["token"],
+        token=token,
         org=config["influxdb"]["org"],
     )
 
